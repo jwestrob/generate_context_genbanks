@@ -21,7 +21,11 @@ You can use multiple annotation file types simultaneously, since there are multi
 
 - GOOSOS (https://github.com/jwestrob/GOOSOS)
 
-- Custom annotation files
+- Custom annotation files (see below example and the examples folder in this repository)
+
+# You talked about examples but I don't see any! I want to speak with your manager right now young man! Go get them. I'll wait.
+
+Chill Karen. I need to make a gene cluster fasta and generate associated annotations for a public-domain genome that's not part of one of my ongoing projects, so give me a hot second OK?
 
 ## I keep trying to use kofamscan but your script gets mad at me or messes up in some miscellaneous way.
 

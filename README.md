@@ -23,6 +23,9 @@ You can use multiple annotation file types simultaneously, since there are multi
 
 - Custom annotation files
 
+## I keep trying to use kofamscan but your script gets mad at me or messes up in some miscellaneous way.
+
+I'm not surprised; in the Banfield lab we've developed a processing pipeline that takes the output of KOFAMscan and selects only the above-threshold hits. If you're trying to use this script, want to include KOFAM info, and aren't in the Banfield lab, hit me up.
 
 ## What the heck? Custom annotation files?
 

@@ -7,7 +7,7 @@ Generating genbanks with annotations for use with Clinker.
 
 OK fine.
 
-`python generate_context_genbanks.py -nucdir [contigs
+`python generate_context_genbanks.py -nucdir [contigs directory] -protdir 
 
 # What does this script do?
 
@@ -18,6 +18,8 @@ This script takes protein fastas containing gene clusters of interest and their 
 Because genbank files are a pain in the tuchus and figuring out the names of the subfields you can add annotations to is something you'd probably rather I do for you.
 
 # What sort of conventions do the input data need to follow?
+
+Importantly, the protein fastas in the `protdir` folder should only include the ORFs in the clusters you want to visualize with Clinker. This is important, so you should pay attention to this. Because it's important.
 
 I'm assuming the nucleotide directory will be full of files called `[genome_id].fna`, the protein directory will be full of files called `[genome_id].faa`,  pfamscan directory `[genome_id].faa.out` and kofamscan directory `[genome_id].faa.out.parsed.good` because of the custom pipeline I process KOFAMscan data with. More information follows, I suppose.
 

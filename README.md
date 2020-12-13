@@ -3,6 +3,12 @@ Generating genbanks with annotations for use with Clinker.
 
 ---
 
+# Just give me an example command, I don't want to hear the whole spiel.
+
+OK fine.
+
+`python generate_context_genbanks.py -nucdir [contigs
+
 # What does this script do?
 
 This script takes protein fastas containing gene clusters of interest and their corresponding nucleotide fasta files, combines them with multiple possible annotation file types, and constructs genbank files ready to use with Clinker (https://github.com/gamcil/clinker).
@@ -10,6 +16,10 @@ This script takes protein fastas containing gene clusters of interest and their 
 # Why did you make a script to do that?
 
 Because genbank files are a pain in the tuchus and figuring out the names of the subfields you can add annotations to is something you'd probably rather I do for you.
+
+# What sort of conventions do the input data need to follow?
+
+I'm assuming the nucleotide directory will be full of files called `[genome_id].fna`, the protein directory will be full of files called `[genome_id].faa`,  pfamscan directory `[genome_id].faa.out` and kofamscan directory `[genome_id].faa.out.parsed.good` because of the custom pipeline I process KOFAMscan data with. More information follows, I suppose.
 
 # What kind of annotation files can I use with this script?
 
@@ -19,7 +29,7 @@ You can use multiple annotation file types simultaneously, since there are multi
 
 - kofamscan (https://github.com/takaram/kofam_scan)
 
-- GOOSOS (https://github.com/jwestrob/GOOSOS)
+- GOOSOS (https://github.com/jwestrob/GOOSOS); specifically, the file `all_hits_evalues_df` that `GOOSOS.py` generates after a successful run.
 
 - Custom annotation files (see below example and the examples folder in this repository)
 

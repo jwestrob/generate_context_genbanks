@@ -7,7 +7,7 @@ Generating genbanks with annotations for use with Clinker.
 
 OK fine.
 
-`python generate_context_genbanks.py -nucdir [contigs directory] -protdir 
+`python generate_context_genbanks.py -nucdir [contigs directory] -protdir [protein gene cluster fasta directory] -pfamscandir [pfamscan output for the proteins you want] -outdir [output directory]`
 
 # What does this script do?
 

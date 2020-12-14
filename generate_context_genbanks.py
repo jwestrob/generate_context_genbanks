@@ -70,8 +70,12 @@ for protein_file in tqdm(os.listdir(protein_dir)):
     #Get the protein recs
     protein_recs = list(SeqIO.parse(os.path.join(protein_dir, protein_file), 'fasta'))
     rec_ids = [rec.id for rec in protein_recs]
-
-    scaffold_id = '_'.join(protein_recs[0].id.split('|')[1].split('_')[:-1])
+    if '|' in protein_recs[0].id:
+        #Proteins are labeled
+        scaffold_id = '_'.join(protein_recs[0].id.split('|')[1].split('_')[:-1])
+    else:
+        #Proteins are unlabeled
+        scaffold_id = '_'.join(protein_recs[0].id.split('_')[:-1])
     genome_id = protein_file.split('.faa')[0]
 
     #Get the scaffold rec
@@ -156,4 +160,3 @@ for protein_file in tqdm(os.listdir(protein_dir)):
 
 
     SeqIO.write(genbank_rec, os.path.join(outdir, genome_id + '_' + scaffold_id + '.gbk'), 'genbank')
-

@@ -74,21 +74,19 @@ def parse_pfam_outfile(test_outfile):
     test_pfam_df['orfnum'] = test_pfam_df['orf_id'].apply(lambda x: int(x.split('_')[-1]))
     return test_pfam_df
 
-for protein_file in tqdm(os.listdir(protein_dir)):
-    #Get the protein recs
-    protein_recs = list(SeqIO.parse(os.path.join(protein_dir, protein_file), 'fasta'))
-    rec_ids = [rec.id for rec in protein_recs]
-    if '|' in protein_recs[0].id:
-        #Proteins are labeled
-        scaffold_id = '_'.join(protein_recs[0].id.split('|')[1].split('_')[:-1])
+def grab_scaffold(header):
+    if '|' in header:
+        return '_'.join(header.split('|')[1].split('_')[:-1])
     else:
-        #Proteins are unlabeled
-        scaffold_id = '_'.join(protein_recs[0].id.split('_')[:-1])
+        return '_'.join(header.split('_')[:-1])
+
+def construct_scaffold_genbank(protein_recs, scaffold_id, outdir=outdir):
+
     genome_id = protein_file.split('.faa')[0]
 
     #Get the scaffold rec
-    grab_scaffold = lambda x: x.id == scaffold_id
-    contigs = list(filter(grab_scaffold, SeqIO.parse(os.path.join(contigs_dir, protein_file.replace('.faa', '.fna')), 'fasta')))
+    scaffold_filter = lambda x: x.id == scaffold_id
+    contigs = list(filter(scaffold_filter, SeqIO.parse(os.path.join(contigs_dir, protein_file.replace('.faa', '.fna')), 'fasta')))
 
     genbank_rec = contigs[0]
 
@@ -162,7 +160,7 @@ for protein_file in tqdm(os.listdir(protein_dir)):
             rec_feature.qualifiers['label'] = goosos_annotations
 
         if annotation_dict != None:
-          
+
             if protein_rec.id in annotation_dict:
                 rec_feature.qualifiers['id'] = annotation_dict[protein_rec.id]
             elif '|' in protein_rec.id and unlabeled_annotation:
@@ -175,3 +173,25 @@ for protein_file in tqdm(os.listdir(protein_dir)):
 
 
     SeqIO.write(genbank_rec, os.path.join(outdir, genome_id + '_' + scaffold_id + '.gbk'), 'genbank')
+    return
+
+
+
+
+def main():
+    for protein_file in tqdm(os.listdir(protein_dir)):
+        #Get the protein recs
+        protein_recs = list(SeqIO.parse(os.path.join(protein_dir, protein_file), 'fasta'))
+        rec_ids = [rec.id for rec in protein_recs]
+        scaffolds = list(map(grab_scaffold, rec_ids))
+        if len(set(scaffolds)) > 1:
+            #There are multiple scaffolds in your dataset
+            scaffolds = list(set(scaffolds))
+            for scaffold in scaffolds:
+                scaffold_proteins = list(filter(lambda x: grab_scaffold(x.id) == scaffold))
+                construct_scaffold_genbank(scaffold_proteins, scaffold)
+        else:
+            construct_scaffold_genbank(scaffold_proteins, scaffolds[0])
+
+if __name__ == "__main__":
+    main()

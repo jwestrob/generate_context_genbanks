@@ -41,7 +41,15 @@ goososfile = args.goososfile
 if args.custom_annotationfile != None:
     annotationfile = os.path.abspath(args.custom_annotationfile)
     annotation_df = pd.read_csv(annotationfile, sep='\t', names=['orf_id', 'annotation'])
-    annotation_dict = dict(zip(annotation_df.orf_id.tolist(), annotation_dict.annotation.tolist()))
+    annotation_dict = dict(zip(annotation_df.orf_id.tolist(), annotation_df.annotation.tolist()))
+    test_proteinfile = os.listdir(protein_dir)[0]
+    for rec in SeqIO.parse(os.path.join(protein_dir, test_proteinfile), 'fasta'):
+        genome_id = test_proteinfile.split('.faa')[0]
+        if '|' in rec.id and '|' not in annotation_df.iloc[0].orf_id:
+            unlabeled_annotation = True
+        else:
+            unlabeled_annotation = False
+        break
 else:
     annotation_dict = None
 
@@ -153,9 +161,16 @@ for protein_file in tqdm(os.listdir(protein_dir)):
             goosos_annotations = '+'.join(goosos_df.family_hmm.tolist())
             rec_feature.qualifiers['label'] = goosos_annotations
 
-        if annotation_dict != None and protein_rec.id in annotation_dict:
-            rec_feature.qualifiers['id'] = annotation_dict[protein_rec.id]
-
+        if annotation_dict != None:
+          
+            if protein_rec.id in annotation_dict:
+                rec_feature.qualifiers['id'] = annotation_dict[protein_rec.id]
+            elif '|' in protein_rec.id and unlabeled_annotation:
+                if protein_rec.id.split('|') in annotation_dict:
+                    rec_feature.qualifiers['id'] = annotation_dict[protein_rec.id.split('|')]
+            elif '|' not in protein_rec.id and not unlabeled_annotation:
+                if genome_id + '|' + protein_rec in annotation_dict:
+                    rec_feature.qualifiers['id'] = annotation_dict[genome_id + '|' + protein_rec]
         genbank_rec.features.append(rec_feature)
 
 

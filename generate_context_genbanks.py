@@ -136,7 +136,10 @@ def construct_scaffold_genbank(protein_recs, protein_file, scaffold_id, outdir=o
         rec_feature = SeqFeature.SeqFeature(rec_location, type="CDS", strand=strand)
 
         #Add ORF name without genome ID
-        rec_feature.qualifiers['protein_id'] = protein_rec.id.split('|')[1]
+        if '|' in protein_rec.id:
+            rec_feature.qualifiers['protein_id'] = protein_rec.id.split('|')[1]
+        else:
+            rec_feature.qualifiers['protein_id'] = protein_rec.id
         rec_feature.qualifiers['translation'] = protein_rec.seq
 
         #Get pfam info

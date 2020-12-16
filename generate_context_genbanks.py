@@ -191,7 +191,7 @@ def main():
                 scaffold_proteins = list(filter(lambda x: grab_scaffold(x.id) == scaffold))
                 construct_scaffold_genbank(scaffold_proteins, scaffold)
         else:
-            construct_scaffold_genbank(scaffold_proteins, scaffolds[0])
+            construct_scaffold_genbank(protein_recs, scaffolds[0])
 
 if __name__ == "__main__":
     main()

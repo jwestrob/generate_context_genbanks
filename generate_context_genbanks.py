@@ -170,7 +170,7 @@ def construct_scaffold_genbank(protein_recs, protein_file, scaffold_id, outdir=o
                 if protein_rec.id.split('|') in annotation_dict:
                     rec_feature.qualifiers['id'] = annotation_dict[protein_rec.id.split('|')]
             elif '|' not in protein_rec.id and not unlabeled_annotation:
-                if genome_id + '|' + protein_rec in annotation_dict:
+                if genome_id + '|' + protein_rec.id in annotation_dict:
                     rec_feature.qualifiers['id'] = annotation_dict[genome_id + '|' + protein_rec]
         genbank_rec.features.append(rec_feature)
 

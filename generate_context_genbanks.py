@@ -182,7 +182,7 @@ def construct_scaffold_genbank(protein_recs, protein_file, scaffold_id, outdir=o
 
 
 def main():
-    for protein_file in tqdm(os.listdir(protein_dir)):
+    for protein_file in tqdm(filter(lambda x: x.endswith('.faa'), os.listdir(protein_dir))):
         #Get the protein recs
         protein_recs = list(SeqIO.parse(os.path.join(protein_dir, protein_file), 'fasta'))
         rec_ids = [rec.id for rec in protein_recs]

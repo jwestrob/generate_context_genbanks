@@ -80,7 +80,7 @@ def grab_scaffold(header):
     else:
         return '_'.join(header.split('_')[:-1])
 
-def construct_scaffold_genbank(protein_recs, scaffold_id, outdir=outdir):
+def construct_scaffold_genbank(protein_recs, protein_file, scaffold_id, outdir=outdir):
 
     genome_id = protein_file.split('.faa')[0]
 
@@ -189,9 +189,9 @@ def main():
             scaffolds = list(set(scaffolds))
             for scaffold in scaffolds:
                 scaffold_proteins = list(filter(lambda x: grab_scaffold(x.id) == scaffold))
-                construct_scaffold_genbank(scaffold_proteins, scaffold)
+                construct_scaffold_genbank(scaffold_proteins, protein_file, scaffold)
         else:
-            construct_scaffold_genbank(protein_recs, scaffolds[0])
+            construct_scaffold_genbank(protein_recs, protein_file, scaffolds[0])
 
 if __name__ == "__main__":
     main()

@@ -102,14 +102,14 @@ def construct_scaffold_genbank(protein_recs, scaffold_id, outdir=outdir):
             kofam_file = list(filter(lambda x: x == protein_file + '.out.parsed.good', os.listdir(kofam_dir)))[0]
         except:
             kofam_scafdf = None
-            break
+            
 
+        if kofam_scafdf != None:
+            kofam_df = pd.read_csv(os.path.join(kofam_dir, kofam_file), sep='\t', names=kofam_header)
 
-        kofam_df = pd.read_csv(os.path.join(kofam_dir, kofam_file), sep='\t', names=kofam_header)
-
-        kofam_df['scaffold_id'] = kofam_df.orf_id.apply(lambda x: '_'.join(x.split('_')[:-1]))
-        kofam_df['scaffold_id'] = kofam_df.scaffold_id.apply(lambda x: x.split('|')[1] if '|' in x else x)
-        kofam_scafdf = kofam_df[kofam_df.scaffold_id == scaffold_id]
+            kofam_df['scaffold_id'] = kofam_df.orf_id.apply(lambda x: '_'.join(x.split('_')[:-1]))
+            kofam_df['scaffold_id'] = kofam_df.scaffold_id.apply(lambda x: x.split('|')[1] if '|' in x else x)
+            kofam_scafdf = kofam_df[kofam_df.scaffold_id == scaffold_id]
     else:
         kofam_scafdf = None
 

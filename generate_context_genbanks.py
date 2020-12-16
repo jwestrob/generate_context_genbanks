@@ -102,7 +102,7 @@ def construct_scaffold_genbank(protein_recs, scaffold_id, outdir=outdir):
             kofam_file = list(filter(lambda x: x == protein_file + '.out.parsed.good', os.listdir(kofam_dir)))[0]
         except:
             kofam_scafdf = None
-            continue
+            break
 
 
         kofam_df = pd.read_csv(os.path.join(kofam_dir, kofam_file), sep='\t', names=kofam_header)

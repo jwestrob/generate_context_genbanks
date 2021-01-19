@@ -71,6 +71,7 @@ def parse_pfam_outfile(test_outfile):
     split_lines = [x.split() for x in list(filter(lambda x: not x.startswith('#'), lines))]
     test_pfam_df = pd.DataFrame(split_lines[1:], columns=header)
     test_pfam_df['scaffold_id'] = test_pfam_df['orf_id'].apply(lambda x: '_'.join(x.split('_')[:-1]).split('|')[1])
+    test_pfam_df['orf_id'] = test_pfam_df['orf_id'] .apply(lambda x: x.split('|')[1] if '|' in x else x)
     test_pfam_df['orfnum'] = test_pfam_df['orf_id'].apply(lambda x: int(x.split('_')[-1]))
     return test_pfam_df
 
@@ -86,14 +87,23 @@ def construct_scaffold_genbank(protein_recs, protein_file, scaffold_id, outdir=o
 
     #Get the scaffold rec
     scaffold_filter = lambda x: x.id == scaffold_id
-    contigs = list(filter(scaffold_filter, SeqIO.parse(os.path.join(contigs_dir, protein_file.replace('.faa', '.fna')), 'fasta')))
+    if '|' not in protein_file:
+        contigs = list(filter(scaffold_filter, SeqIO.parse(os.path.join(contigs_dir, protein_file.replace('.faa', '.fna')), 'fasta')))
+    else:
+        genome_id = protein_file.split('|')[0]
+        contigs = list(filter(scaffold_filter, SeqIO.parse(os.path.join(contigs_dir, genome_id + '.fna'), 'fasta')))
 
     genbank_rec = contigs[0]
 
     #Scaffold-only pfamscan annotations
     if pfam_dir != None:
-        pfam_file = list(filter(lambda x: x == protein_file + '.out', os.listdir(pfam_dir)))[0]
-        pfam_df = parse_pfam_outfile(os.path.join(pfam_dir, pfam_file))
+        try:
+            pfam_file = list(filter(lambda x: x == protein_file + '.out', os.listdir(pfam_dir)))[0]
+            pfam_df = parse_pfam_outfile(os.path.join(pfam_dir, pfam_file))
+        except:
+            pfam_file = None
+            pfam_df = None
+        #pfam_df['orf_id'] = pfam_df.orf_id.apply(lambda x: x.split('|')[1] if '|' in x else x)
     else:
         pfam_df = None
 
@@ -101,10 +111,11 @@ def construct_scaffold_genbank(protein_recs, protein_file, scaffold_id, outdir=o
         try:
             kofam_file = list(filter(lambda x: x == protein_file + '.out.parsed.good', os.listdir(kofam_dir)))[0]
         except:
+            print(genome_id + ' doesnt have KOFAM')
+            kofam_file = None
             kofam_scafdf = None
-            
 
-        if kofam_scafdf != None:
+        if kofam_file != None:
             kofam_df = pd.read_csv(os.path.join(kofam_dir, kofam_file), sep='\t', names=kofam_header)
 
             kofam_df['scaffold_id'] = kofam_df.orf_id.apply(lambda x: '_'.join(x.split('_')[:-1]))
@@ -143,8 +154,11 @@ def construct_scaffold_genbank(protein_recs, protein_file, scaffold_id, outdir=o
         rec_feature.qualifiers['translation'] = protein_rec.seq
 
         #Get pfam info
-        if pfam_dir != None:
-            red_pfam_df = pfam_df[pfam_df.orf_id == protein_rec.id]
+        if pfam_dir != None and pfam_file != None:
+            if '|' in protein_rec.id:
+                red_pfam_df = pfam_df[pfam_df.orf_id == protein_rec.id.split('|')[1]]
+            else:
+                red_pfam_df = pfam_df[pfam_df.orf_id == protein_rec.id]
             domains = '+'.join(red_pfam_df.pfam_name.tolist())
             rec_feature.qualifiers['name'] = domains
 
@@ -191,8 +205,12 @@ def main():
             #There are multiple scaffolds in your dataset
             scaffolds = list(set(scaffolds))
             for scaffold in scaffolds:
-                scaffold_proteins = list(filter(lambda x: grab_scaffold(x.id) == scaffold))
+                scaffold_proteins = list(filter(lambda x: grab_scaffold(x.id) == scaffold, protein_recs))
                 construct_scaffold_genbank(scaffold_proteins, protein_file, scaffold)
+        elif len(scaffolds) == 0:
+            print("No records for " + protein_file)
+            print(len(rec_ids))
+            #sys.exit()
         else:
             construct_scaffold_genbank(protein_recs, protein_file, scaffolds[0])
 
